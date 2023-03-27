@@ -9,23 +9,21 @@ namespace NetworkConfigurationProviderCore.Core
 {
     public static class NetworkConfigurationProviderHelper
     {
-        private readonly static HttpClient _httpClient = new HttpClient();
-
         public static readonly string ClientIdHeader = "ncp-client-id";
         public static readonly string ClientSecretHeader = "ncp-client-secret";
 
-        public static List<KeyValuePair<string, string>> GetData(NcpSettings _settings)
+        public static List<KeyValuePair<string, string>> GetData(HttpClient httpClient, NcpSettings _settings)
         {
             List<KeyValuePair<string, string>> data = default;
 
-            if (!string.IsNullOrEmpty(_settings.ClientId))
+            if (!string.IsNullOrEmpty(_settings.ClientId) && !httpClient.DefaultRequestHeaders.Contains(ClientIdHeader))
             {
-                _httpClient.DefaultRequestHeaders.Add(ClientIdHeader, _settings.ClientId);
+                httpClient.DefaultRequestHeaders.Add(ClientIdHeader, _settings.ClientId);
             }
 
-            if (!string.IsNullOrEmpty(_settings.ClientSecret))
+            if (!string.IsNullOrEmpty(_settings.ClientSecret) && !httpClient.DefaultRequestHeaders.Contains(ClientSecretHeader))
             {
-                _httpClient.DefaultRequestHeaders.Add(ClientSecretHeader, _settings.ClientSecret);
+                httpClient.DefaultRequestHeaders.Add(ClientSecretHeader, _settings.ClientSecret);
             }
 
             var url = _settings.ProviderUrl;
@@ -34,7 +32,7 @@ namespace NetworkConfigurationProviderCore.Core
                 url += $"?{nameof(NcpBasicSettings.Environment)}={_settings.Environment}";
             }
 
-            var response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
+            var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
             var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             if (response.IsSuccessStatusCode)
             {

@@ -2,12 +2,15 @@
 using NetworkConfigurationProviderCore.Core;
 using NetworkConfigurationProviderCore.Models.Settings;
 using System;
+using System.Net.Http;
 using System.Threading;
 
 namespace NetworkConfigurationProviderClient.Core
 {
     public class NetworkConfigurationProvider : ConfigurationProvider
     {
+        private static readonly HttpClient _httpClient = new HttpClient();
+
         private readonly NcpSettings _settings;
         private Timer _timer;
 
@@ -26,7 +29,7 @@ namespace NetworkConfigurationProviderClient.Core
                     throw new ArgumentNullException($"{nameof(NcpSettings.ProviderUrl)} is a required field");
                 }
 
-                var raw = NetworkConfigurationProviderHelper.GetData(_settings);
+                var raw = NetworkConfigurationProviderHelper.GetData(_httpClient, _settings);
                 foreach (var item in raw)
                 {
                     Data[item.Key] = item.Value;
