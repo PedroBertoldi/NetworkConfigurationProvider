@@ -12,9 +12,9 @@ namespace NetworkConfigurationProviderCore.Core
         public static readonly string ClientIdHeader = "ncp-client-id";
         public static readonly string ClientSecretHeader = "ncp-client-secret";
 
-        public static List<KeyValuePair<string, string>> GetData(HttpClient httpClient, NcpSettings _settings)
+        public static Dictionary<string, string> GetData(HttpClient httpClient, NcpSettings _settings)
         {
-            List<KeyValuePair<string, string>> data = default;
+            Dictionary<string, string> data = default;
 
             if (!string.IsNullOrEmpty(_settings.ClientId) && !httpClient.DefaultRequestHeaders.Contains(ClientIdHeader))
             {
@@ -36,7 +36,7 @@ namespace NetworkConfigurationProviderCore.Core
             var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             if (response.IsSuccessStatusCode)
             {
-                data = JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(content);
+                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
             }
             else
             {
